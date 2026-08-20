@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="API Automation Suite" parallel="classes" thread-count="3">
+
+    <listeners>
+        <listener class-name="com.Deepank.api.listeners.TestListener"/>
+    </listeners>
+    
+    <test name="Booking Test">
+        <classes>
+            <class name="com.deepank.api.tests.BookingTest"></class>
+            <class name="com.deepank.api.tests.AuthTest"></class>
+        </classes>
+    </test>
+</suite>
