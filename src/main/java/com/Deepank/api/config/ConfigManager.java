@@ -25,7 +25,21 @@ public class ConfigManager {
     }
 
     public static String get(String key){
-        return properties.getProperty(key);
+
+        String envKey = key.toUpperCase().replace(".", "_");
+
+        String envValue = System.getenv(envKey);
+
+        if (envValue != null && !envValue.isBlank()) {
+            return envValue;
+        }
+
+        String propertyValue = properties.getProperty(key);
+
+        if (propertyValue == null) {
+            throw new RuntimeException("Missing configuration key: " + key);
+        }
+        return propertyValue;
     }
 
 }

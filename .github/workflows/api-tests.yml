@@ -23,6 +23,9 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run API tests
+        env:
+          AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
+          AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
         run: ./gradlew clean test
 
       - name: Generate Allure report
