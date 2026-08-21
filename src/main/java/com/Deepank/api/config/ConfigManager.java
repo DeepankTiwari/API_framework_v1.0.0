@@ -9,14 +9,17 @@ public class ConfigManager {
     private static final Properties properties = new Properties();
 
     static {
-        try(InputStream inputStream = ConfigManager.class.getClassLoader().getResourceAsStream("config.properties")){
+        String env = System.getProperty("env", "qa");
+        String fileName = "config-" + env + ".properties";
+
+        try(InputStream inputStream = ConfigManager.class.getClassLoader().getResourceAsStream(fileName)){
 
             if (inputStream==null){
-                throw new RuntimeException("config.properties not found");
+                throw new RuntimeException("File not found: " + fileName);
             }
             properties.load(inputStream);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load config.properties", e);
+            throw new RuntimeException("Failed to load file: " + fileName, e);
         }
     }
 

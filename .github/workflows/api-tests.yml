@@ -4,6 +4,15 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to run tests against
+        required: true
+        default: qa
+        type: choice
+        options:
+          - qa
+          - staging
 
 jobs:
   api-tests:
@@ -26,7 +35,7 @@ jobs:
         env:
           AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
           AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
-        run: ./gradlew clean test
+        run: ./gradlew clean test -Denv=${{ inputs.environment }}
 
       - name: Generate Allure report
         if: always()
