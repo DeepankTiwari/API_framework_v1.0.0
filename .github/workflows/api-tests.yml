@@ -18,7 +18,7 @@ jobs:
   api-tests:
     runs-on: ubuntu-latest
 
-    environment: ${{ inputs.environment || qa }}
+    environment: ${{ inputs.environment || 'qa' }}
 
     steps:
       - name: Checkout repository
@@ -37,7 +37,7 @@ jobs:
         env:
           AUTH_USERNAME: ${{ secrets.AUTH_USERNAME }}
           AUTH_PASSWORD: ${{ secrets.AUTH_PASSWORD }}
-        run: ./gradlew clean test -Denv=${{ inputs.environment || qa }}
+        run: ./gradlew clean test -Denv=${{ inputs.environment || 'qa' }}
 
       - name: Generate Allure report
         if: always()
