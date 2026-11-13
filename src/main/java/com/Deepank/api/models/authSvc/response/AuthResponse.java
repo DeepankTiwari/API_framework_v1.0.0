@@ -1,5 +1,4 @@
-package com.Deepank.api.models;
-
+package com.Deepank.api.models.authSvc.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,8 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingDates {
+public class AuthResponse {
 
-    private String checkin;
-    private String checkout;
+    private String token;
 }

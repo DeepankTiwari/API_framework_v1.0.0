@@ -1,8 +1,8 @@
 package com.Deepank.api.testdata;
 
-import com.Deepank.api.models.BookingDates;
-import com.Deepank.api.models.request.CreateBookingRequest;
-import com.Deepank.api.models.request.UpdateBookingRequest;
+import com.Deepank.api.models.bookingSvc.BookingDates;
+import com.Deepank.api.models.bookingSvc.request.CreateBookingRequest;
+import com.Deepank.api.models.bookingSvc.request.UpdateBookingRequest;
 
 public final class BookingDataFactory {
 

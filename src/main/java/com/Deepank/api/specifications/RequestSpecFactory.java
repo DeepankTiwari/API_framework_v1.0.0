@@ -4,6 +4,7 @@ package com.Deepank.api.specifications;
 import com.Deepank.api.config.ConfigManager;
 import com.Deepank.api.filters.ApiLoggingFilter;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.http.*;
 import io.restassured.specification.*;
 
@@ -21,6 +22,11 @@ public final class RequestSpecFactory {
                 .setAccept("application/json")
                 .addFilter(ApiLoggingFilter.requestLogger())
                 .addFilter(ApiLoggingFilter.responseLogger())
+                .build();
+    }
+
+    public static ResponseSpecification getd(){
+        return new ResponseSpecBuilder()
                 .build();
     }
 

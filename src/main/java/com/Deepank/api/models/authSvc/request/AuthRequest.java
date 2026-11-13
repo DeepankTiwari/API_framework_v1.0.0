@@ -1,4 +1,4 @@
-package com.Deepank.api.models.request;
+package com.Deepank.api.models.authSvc.request;
 
 import lombok.Builder;
 import lombok.Data;

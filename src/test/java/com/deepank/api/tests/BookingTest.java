@@ -1,92 +1,104 @@
 package com.deepank.api.tests;
 
 
-import com.Deepank.api.assertions.BookingAssertions;
-import com.Deepank.api.auth.TokenManager;
-import com.Deepank.api.models.request.CreateBookingRequest;
-import com.Deepank.api.models.request.UpdateBookingRequest;
-import com.Deepank.api.models.response.CreateBookingResponse;
-import com.Deepank.api.models.response.GetBookingResponse;
-import com.Deepank.api.reporting.AllureAttachentUtil;
-import com.Deepank.api.services.BookingService;
-import com.Deepank.api.testdata.BookingDataFactory;
-import com.deepank.api.data.BookingDataProvider;
+import com.Deepank.api.assertions.DTOComparisonUtil;
+import com.Deepank.api.controllers.BookingControllers;
+import com.Deepank.api.models.apiClient.response.ApiResponse;
+import com.Deepank.api.models.bookingSvc.request.CreateBookingRequest;
+import com.Deepank.api.models.bookingSvc.request.UpdateBookingRequest;
+import com.Deepank.api.models.bookingSvc.response.CreateBookingResponse;
+import com.Deepank.api.models.bookingSvc.response.GetBookingResponse;
+import com.Deepank.api.models.bookingSvc.response.UpdateBookingResponse;
+import com.Deepank.api.models.bookingSvc.BookingTestData;
+import com.deepank.api.testdata.BookingDataProvider;
 import com.deepank.api.retry.RetryAnalyzer;
-import io.restassured.response.Response;
 import org.testng.Assert;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
-import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 
 
 public class BookingTest extends BaseTest {
 
-    private final BookingService bookingService = new BookingService();
+    private final BookingControllers bookingControllers = new BookingControllers();
+
 
     @Test(
             groups = {"smoke", "booking"},
-            dataProvider = "bookingData",
+            dataProvider = "createBookingData",
             dataProviderClass = BookingDataProvider.class,
             retryAnalyzer = RetryAnalyzer.class
     )
-    public void createAndGetBookingTest(CreateBookingRequest createBookingRequest) {
+    public void createAndGetBookingTest(BookingTestData.BookingScenario testData) {
 
-//        CreateBookingRequest createBookingRequest = request;
+        // create booking
+        CreateBookingRequest createBookingRequest = CreateBookingRequest.createBookingRequest(testData);
 
-        Response createBookingResponse = bookingService.createBooking(createBookingRequest);
-        CreateBookingResponse createBookingResponseDTO = createBookingResponse.as(CreateBookingResponse.class);
+        ApiResponse createBookingActualResponseJson = bookingControllers.createBooking(createBookingRequest, 200);
+        CreateBookingResponse createBookingActualResponseDto = createBookingActualResponseJson.as(CreateBookingResponse.class);
+        int bookingId = createBookingActualResponseDto.getBookingid();
+        CreateBookingResponse createBookingExpectedResponse = CreateBookingResponse.createDefault(createBookingRequest);
+        createBookingExpectedResponse.setBookingid(bookingId);
 
-        AllureAttachentUtil.attachResponse(createBookingResponse.asPrettyString());
 
-        Assert.assertEquals(createBookingResponse.statusCode(), 200);
-//        Assert.assertNotEquals(createBookingResponseDTO.getBooking().getBookingdates().getCheckin(), "2026-08-22");
-//        Assert.assertEquals(createBookingResponseDTO.getBooking().getBookingdates().getCheckin(), "2026-08-20");
-//        Assert.assertNotEquals(createBookingResponseDTO.getBooking().getBookingdates().getCheckout(), "2026-08-27");
-//        Assert.assertEquals(createBookingResponseDTO.getBooking().getBookingdates().getCheckout(), "2026-08-25");
-//        Assert.assertNotEquals(createBookingResponseDTO.getBooking().getAdditionalneeds(), "Dinner");
-//        Assert.assertEquals(createBookingResponseDTO.getBooking().getAdditionalneeds(), "Breakfast");
+        DTOComparisonUtil.compareAndThrow(createBookingExpectedResponse, createBookingActualResponseJson.asString());
 
-        int bookingId = createBookingResponseDTO.getBookingid();
-        Assert.assertTrue(bookingId > 0, "BookingId is invalid");
 
-        // Get call for same bookingID
-        Response getBookingResponse = bookingService.getBooking(bookingId);
-        getBookingResponse.then().body(matchesJsonSchemaInClasspath("schemas/get-booking-schema.json"));
-        GetBookingResponse getBookingResponseDTO = getBookingResponse.as(GetBookingResponse.class);
+        // Get booking after Create Booking
+        ApiResponse getBookingResponse = bookingControllers.getBooking(bookingId, 200);
+        GetBookingResponse expectedGetBookingResponseDTO = GetBookingResponse.createDefault(testData);
 
-        Assert.assertEquals(getBookingResponse.statusCode(), 200);
-        BookingAssertions.assertBookingMatches(getBookingResponseDTO, createBookingRequest);
-
-        // Auth token
-        String token = new TokenManager().getToken();
+        DTOComparisonUtil.compareAndThrow(expectedGetBookingResponseDTO, getBookingResponse.asString());
 
         // Update booking
-        UpdateBookingRequest updateBookingRequest = BookingDataFactory.validUpdateBooking();
+        BookingTestData.BookingScenario updateTestData = testData.toBuilder()
+                .firstname("Shashank")
+                .lastname("Pandey")
+                .checkin("2026-08-22")
+                .checkout("2026-08-27")
+                .additionalneeds("Breakfast")
+                .build();
 
-        Response updateBookingResponse = bookingService.updateBooking(bookingId, updateBookingRequest, token);
-        Assert.assertEquals(updateBookingResponse.statusCode(), 200);
-//        Assert.assertEquals(updateBookingResponse.jsonPath().getString("bookingdates.checkin"), "2026-08-22");
-//        Assert.assertNotEquals(updateBookingResponse.jsonPath().getString("bookingdates.checkin"), "2026-08-20");
-//        Assert.assertEquals(updateBookingResponse.jsonPath().getString("bookingdates.checkout"), "2026-08-27");
-//        Assert.assertNotEquals(updateBookingResponse.jsonPath().getString("bookingdates.checkout"), "2026-08-25");
-//        Assert.assertEquals(updateBookingResponse.jsonPath().getString("additionalneeds"), "Dinner");
-//        Assert.assertNotEquals(updateBookingResponse.jsonPath().getString("additionalneeds"), "Breakfast");
+        UpdateBookingRequest updateBookingRequest = UpdateBookingRequest.createUpdateRequest(updateTestData);
+        ApiResponse updateBookingResponse = bookingControllers.updateBookingComplete(updateBookingRequest, bookingId, 200);
+        UpdateBookingResponse expectedUpdateBookingResponse = UpdateBookingResponse.createDefault(updateTestData);
 
-        // Get Booking after Update
-        Response getBookingAfterUpdate = bookingService.getBooking(bookingId);
-        GetBookingResponse getBookingAfterUpdateResponseDTO = getBookingAfterUpdate.as(GetBookingResponse.class);
-        BookingAssertions.assertBookingMatches(getBookingAfterUpdateResponseDTO, updateBookingRequest);
+        DTOComparisonUtil.compareAndThrow(expectedUpdateBookingResponse, updateBookingResponse.asString());
+
+        // Get booking after Update
+        ApiResponse getBookingResponseAfterUpdate = bookingControllers.getBooking(bookingId, 200);
+        GetBookingResponse expectedGetBookingResponseDTOAfterUpdate = GetBookingResponse.createDefault(updateTestData);
+        DTOComparisonUtil.compareAndThrow(expectedGetBookingResponseDTOAfterUpdate, getBookingResponseAfterUpdate.asString());
 
 
         // Delete booking
-        Response deleteBookingResponse = bookingService.deleteBooking(bookingId, token);
-        Assert.assertEquals(deleteBookingResponse.statusCode(), 201);
+        ApiResponse deleteBookingResponse = bookingControllers.deleteBooking(bookingId, 201);
+        Assert.assertEquals(deleteBookingResponse.asString(), "Created", "Delete booking response body mismatch");
+//        Response deleteBookingResponse = bookingService.deleteBooking(bookingId, token);
+//        Assert.assertEquals(deleteBookingResponse.statusCode(), 201);
+
 
         // Get booking after delete
-        Response getBookingAfterDeleteResponse = bookingService.getBooking(bookingId);
-        Assert.assertEquals(getBookingAfterDeleteResponse.statusCode(), 404);
+        ApiResponse getBookingResponseAfterDelete = bookingControllers.getBooking(bookingId,404);
+        Assert.assertEquals(getBookingResponseAfterDelete.asString(), "Not Found", "After delete booking Get booking response body mismatch");
+//        Response getBookingAfterDeleteResponse = bookingService.getBooking(bookingId);
+//        Assert.assertEquals(getBookingAfterDeleteResponse.statusCode(), 404);
     }
 
 
+    @Test(
+            dataProviderClass = BookingDataProvider.class,
+            dataProvider = "invalidAuthData",
+            retryAnalyzer = RetryAnalyzer.class
+    )
+    public void updateBookingInvalidAuthValidations(
+            String scenariosName,
+            String token,
+            int expectedStatusCode
+    ){
+        LOG.info("Running scenarios -> {}", scenariosName);
+
+        UpdateBookingRequest request = UpdateBookingRequest.createUpdateRequest(BookingDataProvider.getBaseCreateScenario());
+        ApiResponse updateBooking = bookingControllers.updateBookingComplete(request, 1234, token, expectedStatusCode);
+        Assert.assertEquals(updateBooking.asString(), "Forbidden");
+
+    }
 }

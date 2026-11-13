@@ -12,6 +12,7 @@
         <classes>
             <class name="com.deepank.api.tests.BookingTest"></class>
             <class name="com.deepank.api.tests.AuthTest"></class>
+            <class name="com.deepank.api.assertions.DTOComparisonUtilTest"/>
         </classes>
     </test>
 </suite>
