@@ -12,15 +12,11 @@ repositories {
 dependencies {
     implementation 'org.testng:testng:7.11.0'
     implementation 'io.rest-assured:rest-assured:5.5.6'
-    implementation 'io.rest-assured:json-schema-validator:5.5.6'
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.2'
-    implementation 'org.assertj:assertj-core:3.25.3'
 
     // Logging
-    implementation 'org.apache.logging.log4j:log4j-api:2.24.3'
-    implementation 'org.apache.logging.log4j:log4j-core:2.24.3'
-    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.24.3'
+    implementation 'ch.qos.logback:logback-classic:1.5.12'
 
     // Reporting
     implementation 'com.aventstack:extentreports:5.1.2'

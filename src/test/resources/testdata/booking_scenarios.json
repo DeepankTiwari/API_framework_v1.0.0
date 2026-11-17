@@ -1,0 +1,33 @@
+{
+  "createScenarios": [
+    {
+      "scenarioName": "valid booking",
+      "firstname": "Deepank",
+      "lastname": "Tiwari",
+      "totalprice": 500,
+      "depositpaid": false,
+      "checkin": "2026-08-15",
+      "checkout": "2026-08-20",
+      "additionalneeds": "WIFI"
+    },
+    {
+      "scenarioName": "another valid booking",
+      "firstname": "Rahul",
+      "lastname": "Sharma",
+      "totalprice": 800,
+      "depositpaid": true,
+      "checkin": "2026-08-10",
+      "checkout": "2026-08-20",
+      "additionalneeds": "Breakfas"
+    }
+  ],
+
+  "updateScenarios": [
+    {
+      "scenarioName": "update booking",
+      "firstname": "Updated",
+      "lastname": "User",
+      "totalprice": 1000
+    }
+  ]
+}

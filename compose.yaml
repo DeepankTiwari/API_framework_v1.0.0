@@ -1,0 +1,7 @@
+services:
+  api-tests:
+    build: .
+    environment:
+      AUTH_USERNAME: ${AUTH_USERNAME}
+      AUTH_PASSWORD: ${AUTH_PASSWORD}
+    command: ./gradlew clean test -Denv=${TEST_ENV:-qa}

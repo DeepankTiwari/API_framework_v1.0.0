@@ -1,0 +1,8 @@
+.git
+.gradle
+.idea
+build
+logs
+*.iml
+allure-results
+allure-report
